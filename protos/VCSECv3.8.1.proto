@@ -1,0 +1,227 @@
+syntax = "proto3";
+
+package vcsec;
+
+option java_outer_classname = "VCSEC";
+option java_package = "com.teslamotors.protocol";
+
+message ClosureStatuses {
+    ClosureState_E frontDriverDoor = 1;
+    ClosureState_E frontPassengerDoor = 2;
+    ClosureState_E rearDriverDoor = 3;
+    ClosureState_E rearPassengerDoor = 4;
+    ClosureState_E rearTrunk = 5;
+    ClosureState_E frontTrunk = 6;
+    ClosureState_E chargePort = 7;
+}
+
+message VehicleStatus {
+    ClosureStatuses closureStatuses = 1;
+    VehicleLockState_E vehicleLockState = 2;
+}
+
+message VehicleInfo {
+    string VIN = 1;
+}
+
+message Capabilities {
+    bool chargePortOpen = 1;
+    bool chargePortClose = 2;
+}
+
+message KeyIdentifier {
+    bytes publicKeySHA1 = 1;
+}
+
+message SignedMessage {
+    bytes token = 1;
+    uint32 counter = 6;
+    bytes keyId = 5;
+    bytes protobufMessageAsBytes = 2;
+    SignatureType signatureType = 3;
+    bytes signature = 4;
+}
+
+message PublicKey {
+    bytes PublicKeyRaw = 1;
+}
+
+message WhitelistInfo {
+    uint32 numberOfEntries = 1;
+    repeated KeyIdentifier whitelistEntries = 2;
+}
+
+message WhitelistEntryInfo {
+    KeyIdentifier keyId = 1;
+    PublicKey publicKey = 2;
+    repeated WhitelistKeyPermission_E permissions = 3;
+}
+
+message InformationRequest {
+    InformationRequestType informationRequestType = 1;
+    KeyIdentifier keyId = 2;
+}
+
+message PermissionChange {
+    PublicKey key = 1;
+    repeated WhitelistKeyPermission_E permission = 2;
+    uint32 secondsToBeActive = 3;
+}
+
+message WhitelistOperation {
+    oneof sub_message {
+        PublicKey addPublicKeyToWhitelist = 1;
+        PublicKey removePublicKeyFromWhitelist = 2;
+        PermissionChange addPermissionsToPublicKey = 3;
+        PermissionChange removePermissionsFromPublicKey = 4;
+        PermissionChange addKeyToWhitelistAndAddPermissions = 5;
+    }
+}
+
+message AuthenticationResponse {
+    AuthenticationLevel_E authenticationLevel = 1;
+}
+
+message SignedMessage_status {
+    uint32 counter = 1;
+    SignedMessage_information_E signedMessageInformation = 2;
+}
+
+message CommandStatus {
+    OperationStatus_E operationStatus = 1;
+    
+    oneof sub_message {
+        SignedMessage_status signedMessageStatus = 2;
+    }
+}
+
+message UnsignedMessage {
+    oneof sub_message {
+        InformationRequest InformationRequest = 1;
+        RKEAction_E RKEAction = 2;
+        AuthenticationResponse authenticationResponse = 3;
+        WhitelistOperation WhitelistOperation = 16;
+    }
+}
+
+message ExternalAuthStatus {
+    bool active = 1;
+    UnsignedMessage messageToBeSignedAsBytes = 2;
+}
+
+message AuthenticationRequest {
+    KeyIdentifier keyIdToAuth = 1;
+    SessionInfo sessionInfo = 2;
+    AuthenticationLevel_E requestedLevel = 3;
+}
+
+message PhoneInfo {
+    uint32 car_version = 1;
+}
+
+message SessionInfo {
+    bytes token = 1;
+    uint32 counter = 2;
+    bytes publicKey = 3;
+}
+
+message ToVCSECMessage {
+    oneof sub_message {
+        SignedMessage signedMessage = 1;
+        UnsignedMessage unsignedMessage = 2;
+    }
+}
+
+message FromVCSECMessage {
+    oneof sub_message {
+        VehicleStatus vehicleStatus = 1;
+        SessionInfo sessionInfo = 2;
+        AuthenticationRequest authenticationRequest = 3;
+        CommandStatus commandStatus = 4;
+        WhitelistInfo whitelistInfo = 16;
+        WhitelistEntryInfo whitelistEntryInfo = 17;
+        VehicleInfo vehicleInfo = 18;
+        Capabilities capabilities = 19;
+        ExternalAuthStatus externalAuthStatus = 20;
+    }
+}
+
+enum ClosureState_E {
+    CLOSURESTATE_CLOSED = 0;
+    CLOSURESTATE_OPEN = 1;
+    CLOSURESTATE_AJAR = 2;
+    CLOSURESTATE_UNKNOWN = 3;
+}
+
+enum VehicleLockState_E {
+    VEHICLELOCKSTATE_UNLOCKED = 0;
+    VEHICLELOCKSTATE_LOCKED = 1;
+    VEHICLELOCKSTATE_INTERNAL_LOCKED = 2;
+    VEHICLELOCKSTATE_SELECTIVE_UNLOCKED = 3;
+}
+
+enum SignatureType {
+    SIGNATURE_TYPE_AES_GCM = 0;
+    SIGNATURE_TYPE_ECDSA = 1;
+    SIGNATURE_TYPE_PRESENT_KEY = 2;
+}
+
+enum InformationRequestType {
+    INFORMATION_REQUEST_TYPE_GET_STATUS = 0;
+    INFORMATION_REQUEST_TYPE_GET_TOKEN = 1;
+    INFORMATION_REQUEST_TYPE_GET_COUNTER = 2;
+    INFORMATION_REQUEST_TYPE_GET_EPHEMERAL_PUBLIC_KEY = 3;
+    INFORMATION_REQUEST_TYPE_GET_SESSION_DATA = 4;
+    INFORMATION_REQUEST_TYPE_GET_WHITELIST_INFO = 5;
+    INFORMATION_REQUEST_TYPE_GET_WHITELIST_ENTRY_INFO = 6;
+    INFORMATION_REQUEST_TYPE_GET_VEHICLE_INFO = 7;
+    INFORMATION_REQUEST_TYPE_GET_CAPABILITIES = 16;
+}
+
+enum RKEAction_E {
+    RKE_ACTION_UNLOCK = 0;
+    RKE_ACTION_LOCK = 1;
+    RKE_ACTION_OPEN_TRUNK = 2;
+    RKE_ACTION_OPEN_FRUNK = 3;
+    RKE_ACTION_OPEN_CHARGE_PORT = 4;
+    RKE_ACTION_CLOSE_CHARGE_PORT = 5;
+    RKE_ACTION_CANCEL_EXTERNAL_AUTHENTICATE = 6;
+}
+
+enum WhitelistKeyPermission_E {
+    WHITELISTKEYPERMISSION_ADD_TO_WHITELIST = 0;
+    WHITELISTKEYPERMISSION_LOCAL_UNLOCK = 1;
+    WHITELISTKEYPERMISSION_LOCAL_DRIVE = 2;
+    WHITELISTKEYPERMISSION_REMOTE_UNLOCK = 3;
+    WHITELISTKEYPERMISSION_REMOTE_DRIVE = 4;
+    WHITELISTKEYPERMISSION_CHANGE_PERMISSIONS = 5;
+    WHITELISTKEYPERMISSION_REMOVE_FROM_WHITELIST = 6;
+    WHITELISTKEYPERMISSION_REMOVE_SELF_FROM_WHITELIST = 7;
+    WHITELISTKEYPERMISSION_UNKNOWN = 31;
+}
+
+enum AuthenticationLevel_E {
+    AUTHENTICATION_LEVEL_NONE = 0;
+    AUTHENTICATION_LEVEL_UNLOCK = 1;
+    AUTHENTICATION_LEVEL_DRIVE = 2;
+}
+
+enum OperationStatus_E {
+    OPERATIONSTATUS_OK = 0;
+    OPERATIONSTATUS_WAIT = 1;
+    OPERATIONSTATUS_ERROR = 2;
+}
+
+enum SignedMessage_information_E {
+    SIGNEDMESSAGE_INFORMATION_NONE = 0;
+    SIGNEDMESSAGE_INFORMATION_FAULT_UNKNOWN = 1;
+    SIGNEDMESSAGE_INFORMATION_FAULT_NOT_ON_WHITELIST = 2;
+    SIGNEDMESSAGE_INFORMATION_FAULT_IV_SMALLER_THAN_EXPECTED = 3;
+    SIGNEDMESSAGE_INFORMATION_FAULT_INVALID_TOKEN = 4;
+    SIGNEDMESSAGE_INFORMATION_FAULT_TOKEN_AND_COUNTER_INVALID = 5;
+    SIGNEDMESSAGE_INFORMATION_FAULT_AES_DECRYPT_AUTH = 6;
+    SIGNEDMESSAGE_INFORMATION_FAULT_ECDSA_INPUT = 7;
+    SIGNEDMESSAGE_INFORMATION_FAULT_ECDSA_SIGNATURE = 8;
+    SIGNEDMESSAGE_INFORMATION_FAULT_LOCAL_ENTITY_START = 9;
+    SIGNEDMESSAGE_INFORMATION_FAULT_LOCAL_ENTITY_RESULT = 10;
+}

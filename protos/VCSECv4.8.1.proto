@@ -1,0 +1,1035 @@
+syntax = "proto3";
+
+package VCSEC;
+
+option java_outer_classname = "VCSEC";
+option java_package = "com.teslamotors.protocol";
+
+message ActiveKey {
+	KeyIdentifier activeKey = 1;
+}
+
+enum Activity_E {
+	ACTIVITY_NONE = 0;
+	ACTIVITY_STATIONARY = 1;
+	ACTIVITY_MOTION = 2;
+	ACTIVITY_SIGNIFICANT_MOTION = 3;
+}
+
+message Alert {
+	oneof sub_message {
+		AlertHandlePulledWithoutAuth alertHandlePulledWithoutAuth = 1;
+	}
+}
+
+message AlertHandlePulledWithoutAuth {
+	bool authRequested = 5;
+	uint32 connectionCount = 3;
+	repeated HandlePulledWithoutAuthDeviceSpecificPayload deviceSpecificPayload = 6;
+	HandlePulled_E handlePulled = 2;
+	uint32 timeSinceAlertSet_ms = 1;
+	bool unknownDevicePresent = 4;
+}
+
+message AppDeviceInfo {
+	bytes hardware_model_sha256 = 1;
+	AppOperatingSystem os = 2;
+}
+
+enum AppDeviceInfoRequest_E {
+	APP_DEVICE_INFO_REQUEST_NONE = 0;
+	APP_DEVICE_INFO_REQUEST_GET_MODEL_NUMBER = 1;
+}
+
+enum AppOperatingSystem {
+	UNKNOWN = 0;
+	ANDROID = 1;
+	IOS = 2;
+}
+
+enum AuthenticationLevel_E {
+	AUTHENTICATION_LEVEL_NONE = 0;
+	AUTHENTICATION_LEVEL_UNLOCK = 1;
+	AUTHENTICATION_LEVEL_DRIVE = 2;
+}
+
+message AuthenticationRequest {
+	KeyIdentifier keyIdToAuth = 1;
+	AuthenticationLevel_E requestedLevel = 3;
+	SessionInfo sessionInfo = 2;
+}
+
+message AuthenticationResponse {
+	AuthenticationLevel_E authenticationLevel = 1;
+	uint32 estimatedDistance = 2;
+}
+
+enum BLEAdditionalTRIMApplied_E {
+	BLE_ADDITIONAL_TRIM_APPLIED_NONE = 0;
+	BLE_ADDITIONAL_TRIM_APPLIED_APPLIED = 1;
+	BLE_ADDITIONAL_TRIM_APPLIED_NOT_APPLIED = 2;
+}
+
+message BLEConfig {
+	oneof sub_message {
+		uint32 ADVInterval = 1;
+		uint32 sleepClockAccuracy = 2;
+	}
+}
+
+message BLEConfigAll {
+	uint32 ADVInterval = 1;
+	uint32 sleepClockAccuracy = 2;
+}
+
+message BLEConfigCommand {
+	BLEConfigCommandType_E BLEConfigCommandType = 1;
+	BLEConfig BLEConfig = 2;
+}
+
+enum BLEConfigCommandType_E {
+	BLE_CONFIG_COMMAND_TYPE_NONE = 0;
+	BLE_CONFIG_COMMAND_TYPE_READ = 1;
+	BLE_CONFIG_COMMAND_TYPE_WRITE = 2;
+}
+
+enum BLEEndpoint_E {
+	BLE_ENDPOINT_LEFT = 0;
+	BLE_ENDPOINT_RIGHT = 1;
+	BLE_ENDPOINT_REAR = 2;
+	BLE_ENDPOINT_CENTER = 3;
+	BLE_ENDPOINT_FRONT = 4;
+	BLE_ENDPOINT_SECONDARY = 5;
+	BLE_ENDPOINT_NFCCRADLE = 6;
+	BLE_ENDPOINT_REARLEFT = 7;
+	BLE_ENDPOINT_REARRIGHT = 8;
+	BLE_ENDPOINT_NONE = 9;
+}
+
+enum BLEPresence {
+	BLE_PRESENCE_NOT_PRESENT = 0;
+	BLE_PRESENCE_PRESENT = 1;
+}
+
+message Capabilities {
+	bool chargePortClose = 2;
+	bool chargePortOpen = 1;
+}
+
+message ClosureMoveRequest {
+	ClosureMoveType_E chargePort = 7;
+	ClosureMoveType_E frontDriverDoor = 1;
+	ClosureMoveType_E frontPassengerDoor = 2;
+	ClosureMoveType_E frontTrunk = 6;
+	ClosureMoveType_E rearDriverDoor = 3;
+	ClosureMoveType_E rearPassengerDoor = 4;
+	ClosureMoveType_E rearTrunk = 5;
+}
+
+enum ClosureMoveType_E {
+	CLOSURE_MOVE_TYPE_NONE = 0;
+	CLOSURE_MOVE_TYPE_MOVE = 1;
+	CLOSURE_MOVE_TYPE_STOP = 2;
+	CLOSURE_MOVE_TYPE_OPEN = 3;
+	CLOSURE_MOVE_TYPE_CLOSE = 4;
+}
+
+enum ClosureState_E {
+	CLOSURESTATE_CLOSED = 0;
+	CLOSURESTATE_OPEN = 1;
+	CLOSURESTATE_AJAR = 2;
+	CLOSURESTATE_UNKNOWN = 3;
+}
+
+message ClosureStatuses {
+	ClosureState_E chargePort = 7;
+	ClosureState_E frontDriverDoor = 1;
+	ClosureState_E frontPassengerDoor = 2;
+	ClosureState_E frontTrunk = 6;
+	ClosureState_E rearDriverDoor = 3;
+	ClosureState_E rearPassengerDoor = 4;
+	ClosureState_E rearTrunk = 5;
+}
+
+message CodeDescriptor {
+	bytes codeDescriptorBytes = 3;
+	UpdaterLocation codeDescriptorLocation = 1;
+	uint32 version = 2;
+}
+
+message CommandStatus {
+	OperationStatus_E operationStatus = 1;
+	oneof sub_message {
+		SignedMessage_status signedMessageStatus = 2;
+		WhitelistOperation_status whitelistOperationStatus = 3;
+	}
+}
+
+message ConnectionMetrics {
+	uint32 badCRCConnEventCount = 3;
+	uint32 goodConnEventCount = 1;
+	uint32 missedConnEventCount = 2;
+}
+
+message DelaySleepRequest {
+	uint32 delayTime_ms = 1;
+}
+
+enum Device_Motion_Confidence {
+	DEVICE_MOTION_CONFIDENCE_UNKNOWN = 0;
+	DEVICE_MOTION_CONFIDENCE_LOW = 1;
+	DEVICE_MOTION_CONFIDENCE_MEDIUM = 2;
+	DEVICE_MOTION_CONFIDENCE_HIGH = 3;
+}
+
+enum Device_Motion_State {
+	DEVICE_MOTION_UNKNOWN = 0;
+	DEVICE_MOTION_STATIONARY = 1;
+	DEVICE_MOTION_WALKING = 2;
+	DEVICE_MOTION_RUNNING = 3;
+	DEVICE_MOTION_AUTOMOTIVE = 4;
+	DEVICE_MOTION_CYCLING = 5;
+}
+
+message DeviceMotion {
+	Device_Motion_Confidence confidence = 2;
+	repeated Device_Motion_State states = 1;
+}
+
+enum DeviceTarget {
+	UNKNOWN_TARGET = 0;
+	DEVELOPMENT_TARGET = 1;
+	PRODUCTION_TARGET = 2;
+}
+
+message ExternalAuthStatus {
+	bool active = 1;
+	UnsignedMessage messageToBeSignedAsBytes = 2;
+}
+
+message FirmwareInfo {
+	DeviceTarget deviceTarget = 1;
+	uint32 versionCounter = 2;
+}
+
+message FromKeyfobMessage {
+	oneof sub_message {
+		SignedMessage signedMessage = 1;
+		UnsignedMessageShort unsignedMessage = 2;
+	}
+}
+
+message FromRCI {
+	bytes response = 1;
+}
+
+message FromTPWheelUnitMessage {
+	oneof sub_message {
+		SignedMessage signedMessage = 1;
+		UnsignedMessageTPWheelUnit unsignedMessage = 2;
+	}
+}
+
+message FromVCSECMessage {
+	oneof sub_message {
+		TPDataRequest_E TPDataRequest = 35;
+		TPNotifyTrackerCommand_E TPNotifyTrackerCommand = 37;
+		BLEConfigCommand BLEConfigCommand = 43;
+		ActiveKey activeKey = 22;
+		Alert alert = 45;
+		AppDeviceInfoRequest_E appDeviceInfoRequest = 44;
+		AuthenticationRequest authenticationRequest = 3;
+		Capabilities capabilities = 19;
+		CommandStatus commandStatus = 4;
+		SessionInfo epochSessionInfo = 40;
+		ExternalAuthStatus externalAuthStatus = 20;
+		GenealogyRequest_E genealogyRequest = 31;
+		IMURequest_E imuRequest = 33;
+		KeyStatusInfo keyStatusInfo = 21;
+		NFCSERequest_E nfcseRequest = 34;
+		PersonalizationInformation personalizationInformation = 5;
+		RCI_control_E rciControl = 42;
+		ResetTrackerCommand_E resetTrackerCommand = 36;
+		SessionInfo sessionInfo = 2;
+		SetTPConfigration setTPConfiguration = 38;
+		SleepManagerRequest sleepManagerRequest = 32;
+		ToRCI toRCICommand = 41;
+		UnknownKeyInfo unknownKeyInfo = 23;
+		UnsecureNotification unsecureNotification = 39;
+		UpdaterCommand updaterCommand = 30;
+		VehicleInfo vehicleInfo = 18;
+		VehicleStatus vehicleStatus = 1;
+		WhitelistEntryInfo whitelistEntryInfo = 17;
+		WhitelistInfo whitelistInfo = 16;
+	}
+}
+
+message Genealogy {
+	bytes partNumber = 2;
+	bytes serialNumber = 1;
+}
+
+enum GenealogyRequest_E {
+	GENEALOGYREQUEST_NONE = 0;
+	GENEALOGYREQUEST_READ = 1;
+	GENEALOGYREQUEST_KEYFOBINFO_READ = 2;
+	GENEALOGYREQUEST_TPWHEELUNITINFO_READ = 3;
+}
+
+message GenealogyResponse {
+	Genealogy currentGenealogy = 1;
+	GenealogyStatus_E status = 2;
+}
+
+enum GenealogyStatus_E {
+	GENEALOGY_STATUS_NONE = 0;
+	GENEALOGY_STATUS_NOT_WRITTEN = 1;
+	GENEALOGY_STATUS_WRITE_SUCCESS = 2;
+	GENEALOGY_STATUS_WRITE_FAILURE = 3;
+	GENEALOGY_STATUS_READ_SUCCESS = 4;
+	GENEALOGY_STATUS_READ_FAILURE = 5;
+	GENEALOGY_STATUS_CRC_FAILURE = 6;
+}
+
+message GetCodeDescriptor {
+	UpdaterLocation location = 1;
+}
+
+message GetSessionInfoRequest {
+	KeyIdentity key_identity = 1;
+}
+
+enum HandlePulled_E {
+	HANDLE_PULLED_FRONT_DRIVER_DOOR = 0;
+	HANDLE_PULLED_FRONT_PASSENGER_DOOR = 1;
+	HANDLE_PULLED_REAR_DRIVER_DOOR = 2;
+	HANDLE_PULLED_REAR_PASSENGER_DOOR = 3;
+	HANDLE_PULLED_TRUNK = 4;
+	HANDLE_PULLED_CHARGE_PORT = 5;
+	HANDLE_PULLED_FRONT_DRIVER_AUTO_PRESENT_DOOR = 6;
+	HANDLE_PULLED_FRONT_PASSENGER_AUTO_PRESENT_DOOR = 7;
+	HANDLE_PULLED_OTHER = 8;
+}
+
+message HandlePulledWithoutAuthDeviceSpecificPayload {
+	sint32 RSSICenter = 7;
+	sint32 RSSIFront = 8;
+	sint32 RSSILeft = 4;
+	sint32 RSSINFCCradle = 10;
+	sint32 RSSIRear = 6;
+	sint32 RSSIRearLeft = 11;
+	sint32 RSSIRearRight = 12;
+	sint32 RSSIRight = 5;
+	sint32 RSSISecondary = 9;
+	AuthenticationLevel_E authenticationLevel = 2;
+	bool highThreshCenterPresent = 15;
+	bool highThreshFrontPresent = 16;
+	bool highThreshLeftPresent = 13;
+	bool highThreshNFCPresent = 21;
+	bool highThreshRearLeftPresent = 18;
+	bool highThreshRearPresent = 17;
+	bool highThreshRearRightPresent = 19;
+	bool highThreshRightPresent = 14;
+	bool highThreshSecondaryPresent = 20;
+	uint32 keyChannel = 1;
+	bool present = 3;
+	bool rawDeltaBayesLeftPresent = 24;
+	bool rawDeltaBayesRightPresent = 25;
+	bool sortedDeltaBayesLeftPresent = 22;
+	bool sortedDeltaBayesRightPresent = 23;
+}
+
+enum IMURequest_E {
+	IMU_REQUEST_NONE = 0;
+	IMU_REQUEST_GET_SLEEP_STATE = 1;
+	IMU_REQUEST_ENABLE_CONTINUOUS_ACTIVITY_UPDATE = 2;
+	IMU_REQUEST_DISABLE_CONTINUOUS_ACTIVITY_UPDATE = 3;
+}
+
+enum IMUState_E {
+	IMU_STATE_NOT_CONFIGURED = 0;
+	IMU_STATE_ACTIVITY = 1;
+	IMU_STATE_INACTIVITY = 2;
+}
+
+message InformationRequest {
+	InformationRequestType informationRequestType = 1;
+	oneof sub_message {
+		KeyIdentifier keyId = 2;
+		bytes publicKey = 3;
+		uint32 slot = 4;
+	}
+}
+
+enum InformationRequestType {
+	INFORMATION_REQUEST_TYPE_GET_STATUS = 0;
+	INFORMATION_REQUEST_TYPE_GET_TOKEN = 1;
+	INFORMATION_REQUEST_TYPE_GET_COUNTER = 2;
+	INFORMATION_REQUEST_TYPE_GET_EPHEMERAL_PUBLIC_KEY = 3;
+	INFORMATION_REQUEST_TYPE_GET_SESSION_DATA = 4;
+	INFORMATION_REQUEST_TYPE_GET_WHITELIST_INFO = 5;
+	INFORMATION_REQUEST_TYPE_GET_WHITELIST_ENTRY_INFO = 6;
+	INFORMATION_REQUEST_TYPE_GET_VEHICLE_INFO = 7;
+	INFORMATION_REQUEST_TYPE_GET_KEYSTATUS_INFO = 8;
+	INFORMATION_REQUEST_TYPE_GET_ACTIVE_KEY = 9;
+	INFORMATION_REQUEST_TYPE_GET_CAPABILITIES = 16;
+}
+
+message KeyfobInfo {
+	bytes appCRC = 1;
+	uint32 batteryVoltage_mV = 2;
+	int32 temperature_degreesC = 3;
+}
+
+enum KeyFormFactor {
+	KEY_FORM_FACTOR_UNKNOWN = 0;
+	KEY_FORM_FACTOR_NFC_CARD = 1;
+	KEY_FORM_FACTOR_3_BUTTON_BLE_CAR_KEYFOB = 2;
+	KEY_FORM_FACTOR_BLE_DEVICE = 3;
+	KEY_FORM_FACTOR_NFC_DEVICE = 4;
+	KEY_FORM_FACTOR_BLE_AND_NFC_DEVICE = 5;
+	KEY_FORM_FACTOR_IOS_DEVICE = 6;
+	KEY_FORM_FACTOR_ANDROID_DEVICE = 7;
+	KEY_FORM_FACTOR_3_BUTTON_BLE_CAR_KEYFOB_P60 = 8;
+	KEY_FORM_FACTOR_CLOUD_KEY = 9;
+	KEY_FORM_FACTOR_3_BUTTON_GEN2_CAR_KEYFOB_P60 = 10;
+	KEY_FORM_FACTOR_5_BUTTON_GEN2_CAR_KEYFOB_P60 = 11;
+	KEY_FORM_FACTOR_3_BUTTON_GEN2_CAR_KEYFOB_P60_V2 = 12;
+	KEY_FORM_FACTOR_3_BUTTON_GEN2_CAR_KEYFOB_P60_V3 = 13;
+}
+
+message KeyIdentifier {
+	bytes publicKeySHA1 = 1;
+}
+
+message KeyIdentity {
+	oneof sub_message {
+		bytes key_id = 2;
+		bytes public_key = 1;
+	}
+}
+
+message KeyMetadata {
+	KeyFormFactor keyFormFactor = 1;
+}
+
+message KeyStatus {
+	BLEPresence blePresence = 3;
+	KeyIdentifier keyId = 1;
+	NFCPresence nfcPresence = 2;
+}
+
+message KeyStatusInfo {
+	repeated KeyStatus keyStatuses = 1;
+}
+
+enum LRDetectionResult_E {
+	LRDETECTIONRESULT_ERROR_MAXCNT = 0;
+	LRDETECTIONRESULT_ERROR_NEGPERIOD = 1;
+	LRDETECTIONRESULT_ERROR_LONGPERIOD = 2;
+	LRDETECTIONRESULT_LEFT = 3;
+	LRDETECTIONRESULT_RIGHT = 4;
+}
+
+enum MLXWakePeriod_E {
+	MLXWAKEPERIOD_2_MS = 0;
+	MLXWAKEPERIOD_3_MS = 1;
+	MLXWAKEPERIOD_5_MS = 2;
+	MLXWAKEPERIOD_15_MS = 3;
+	MLXWAKEPERIOD_30_MS = 4;
+	MLXWAKEPERIOD_50_MS = 5;
+	MLXWAKEPERIOD_100_MS = 6;
+	MLXWAKEPERIOD_150_MS = 7;
+	MLXWAKEPERIOD_250_MS = 8;
+	MLXWAKEPERIOD_500_MS = 9;
+	MLXWAKEPERIOD_1_S = 10;
+	MLXWAKEPERIOD_2_S = 11;
+	MLXWAKEPERIOD_2_5_S = 12;
+	MLXWAKEPERIOD_3_S = 13;
+	MLXWAKEPERIOD_4_S = 14;
+	MLXWAKEPERIOD_5_S = 15;
+	MLXWAKEPERIOD_6_S = 16;
+	MLXWAKEPERIOD_7_S = 17;
+	MLXWAKEPERIOD_8_S = 18;
+	MLXWAKEPERIOD_9_S = 19;
+	MLXWAKEPERIOD_10_S = 20;
+	MLXWAKEPERIOD_11_S = 21;
+	MLXWAKEPERIOD_12_S = 22;
+	MLXWAKEPERIOD_15_S = 23;
+	MLXWAKEPERIOD_20_S = 24;
+	MLXWAKEPERIOD_30_S = 25;
+	MLXWAKEPERIOD_1_M = 26;
+	MLXWAKEPERIOD_2_M = 27;
+	MLXWAKEPERIOD_3_M = 28;
+	MLXWAKEPERIOD_4_M = 29;
+	MLXWAKEPERIOD_5_M = 30;
+	MLXWAKEPERIOD_10_M = 31;
+	MLXWAKEPERIOD_16_M = 32;
+	MLXWAKEPERIOD_NOT_SET = 33;
+}
+
+enum NFCPresence {
+	NFC_PRESENCE_NOT_PRESENT = 0;
+	NFC_PRESENCE_PRESENT_AT_B_PILLAR = 1;
+	NFC_PRESENCE_PRESENT_AT_CENTER_CONSOLE = 2;
+}
+
+enum NFCSEDevicePubKeyState_E {
+	NFCSEC_DEVICEPUBKEY_STATE_NONE = 0;
+	NFCSEC_DEVICEPUBKEY_STATE_RETRIEVED = 1;
+	NFCSEC_DEVICEPUBKEY_STATE_NOT_RETRIEVED = 2;
+}
+
+enum NFCSEInsecureCommandState_E {
+	NFCSEC_INSECURE_COMMAND_STATE_NONE = 0;
+	NFCSEC_INSECURE_COMMAND_STATE_ENABLED = 1;
+	NFCSEC_INSECURE_COMMAND_STATE_DISABLED = 2;
+}
+
+enum NFCSERequest_E {
+	NFCSE_REQUEST_NONE = 0;
+	NFCSE_REQUEST_REFETCH_SESSION_INFO = 1;
+	NFCSE_REQUEST_DISABLE_INSECURE_COMMANDS = 2;
+	NFCSE_REQUEST_GET_CURRENT_STATE = 3;
+}
+
+enum NFCSESharedSecretState_E {
+	NFCSEC_SHAREDSECRET_STATE_NONE = 0;
+	NFCSEC_SHAREDSECRET_STATE_GENERATED = 1;
+	NFCSEC_SHAREDSECRET_STATE_NOT_GENERATED = 2;
+}
+
+message NFCSEState {
+	NFCSEDevicePubKeyState_E devicePubKeyState = 1;
+	NFCSEInsecureCommandState_E insecureCommandState = 4;
+	NFCSESharedSecretState_E sharedSecretState = 3;
+	PublicKey vehiclePubKey = 5;
+	NFCSEVehiclePubKeyState_E vehiclePubKeyState = 2;
+}
+
+enum NFCSEVehiclePubKeyState_E {
+	NFCSEC_VEHICLEPUBKEY_STATE_NONE = 0;
+	NFCSEC_VEHICLEPUBKEY_STATE_RETRIEVED = 1;
+	NFCSEC_VEHICLEPUBKEY_STATE_NOT_RETRIEVED = 2;
+}
+
+enum OperationStatus_E {
+	OPERATIONSTATUS_OK = 0;
+	OPERATIONSTATUS_WAIT = 1;
+	OPERATIONSTATUS_ERROR = 2;
+}
+
+message PermissionChange {
+	PublicKey key = 1;
+	Role keyRole = 4;
+	repeated WhitelistKeyPermission_E permission = 2;
+	uint32 secondsToBeActive = 3;
+}
+
+message PersonalizationInformation {
+	bytes VIN = 1;
+}
+
+message PhoneInfo {
+	uint32 car_version = 1;
+}
+
+message PublicKey {
+	bytes PublicKeyRaw = 1;
+}
+
+enum RCI_control_E {
+	RCI_CONTROL_NONE = 0;
+	RCI_CONTROL_TURN_OFF = 1;
+}
+
+message RCISignature {
+	bytes nonce = 1;
+	bytes tag = 2;
+}
+
+enum ResetTrackerCommand_E {
+	RESETTRACKER_COMMAND_NONE = 0;
+	RESETTRACKER_COMMAND_GET_STATS = 1;
+	RESETTRACKER_COMMAND_CLEAR_STATS = 2;
+}
+
+message ResetTrackerStats {
+	uint32 totalResetsDueToClockLoss = 6;
+	uint32 totalResetsDueToPinReset = 2;
+	uint32 totalResetsDueToPowerOn = 1;
+	uint32 totalResetsDueToSystemReset = 7;
+	uint32 totalResetsDueToVDDLoss = 4;
+	uint32 totalResetsDueToVDDRLoss = 5;
+	uint32 totalResetsDueToVDDSLoss = 3;
+	uint32 totalResetsDueToWakeupFromShutdown = 9;
+	uint32 totalResetsDueToWakeupFromTCKNoise = 10;
+	uint32 totalResetsDueToWarmReset = 8;
+}
+
+enum RKEAction_E {
+	RKE_ACTION_UNLOCK = 0;
+	RKE_ACTION_LOCK = 1;
+	RKE_ACTION_OPEN_TRUNK = 2;
+	RKE_ACTION_OPEN_FRUNK = 3;
+	RKE_ACTION_OPEN_CHARGE_PORT = 4;
+	RKE_ACTION_CLOSE_CHARGE_PORT = 5;
+	RKE_ACTION_CANCEL_EXTERNAL_AUTHENTICATE = 6;
+	RKE_ACTION_SINGLE_PRESS_TOP = 7;
+	RKE_ACTION_DOUBLE_PRESS_TOP = 8;
+	RKE_ACTION_TRIPLE_PRESS_TOP = 9;
+	RKE_ACTION_HOLD_TOP = 10;
+	RKE_ACTION_SINGLE_PRESS_BACK = 11;
+	RKE_ACTION_DOUBLE_PRESS_BACK = 12;
+	RKE_ACTION_TRIPLE_PRESS_BACK = 13;
+	RKE_ACTION_HOLD_BACK = 14;
+	RKE_ACTION_SINGLE_PRESS_FRONT = 15;
+	RKE_ACTION_DOUBLE_PRESS_FRONT = 16;
+	RKE_ACTION_TRIPLE_PRESS_FRONT = 17;
+	RKE_ACTION_HOLD_FRONT = 18;
+	RKE_ACTION_UNKNOWN = 19;
+	RKE_ACTION_REMOTE_DRIVE = 20;
+	RKE_ACTION_SINGLE_PRESS_LEFT = 21;
+	RKE_ACTION_DOUBLE_PRESS_LEFT = 22;
+	RKE_ACTION_TRIPLE_PRESS_LEFT = 23;
+	RKE_ACTION_HOLD_LEFT = 24;
+	RKE_ACTION_SINGLE_PRESS_RIGHT = 25;
+	RKE_ACTION_DOUBLE_PRESS_RIGHT = 26;
+	RKE_ACTION_TRIPLE_PRESS_RIGHT = 27;
+	RKE_ACTION_HOLD_RIGHT = 28;
+	RKE_ACTION_AUTO_SECURE_VEHICLE = 29;
+	RKE_ACTION_WAKE_VEHICLE = 30;
+}
+
+enum Role {
+	ROLE_NONE = 0;
+	ROLE_SERVICE = 1;
+	ROLE_OWNER = 2;
+	ROLE_DRIVER = 3;
+	ROLE_FM = 4;
+}
+
+message SessionInfo {
+	uint32 counter = 2;
+	bytes publicKey = 3;
+	bytes token = 1;
+}
+
+message SetTPConfigration {
+	TPMotionConfig motionConfig = 2;
+	TPStationaryConfig stationaryConfig = 1;
+}
+
+message SetUpdaterLocation {
+	UpdaterLocation updaterLocation = 1;
+}
+
+enum SignatureType {
+	SIGNATURE_TYPE_AES_GCM = 0;
+	SIGNATURE_TYPE_ECDSA = 1;
+	SIGNATURE_TYPE_PRESENT_KEY = 2;
+	SIGNATURE_TYPE_AES_GCM_TOKEN = 3;
+	SIGNATURE_TYPE_UNSIGNED = 4;
+}
+
+message SignedMessage {
+	uint32 counter = 6;
+	bytes keyId = 5;
+	bytes protobufMessageAsBytes = 2;
+	bytes signature = 4;
+	SignatureType signatureType = 3;
+	bytes token = 1;
+}
+
+enum SignedMessage_information_E {
+	SIGNEDMESSAGE_INFORMATION_NONE = 0;
+	SIGNEDMESSAGE_INFORMATION_FAULT_UNKNOWN = 1;
+	SIGNEDMESSAGE_INFORMATION_FAULT_NOT_ON_WHITELIST = 2;
+	SIGNEDMESSAGE_INFORMATION_FAULT_IV_SMALLER_THAN_EXPECTED = 3;
+	SIGNEDMESSAGE_INFORMATION_FAULT_INVALID_TOKEN = 4;
+	SIGNEDMESSAGE_INFORMATION_FAULT_TOKEN_AND_COUNTER_INVALID = 5;
+	SIGNEDMESSAGE_INFORMATION_FAULT_AES_DECRYPT_AUTH = 6;
+	SIGNEDMESSAGE_INFORMATION_FAULT_ECDSA_INPUT = 7;
+	SIGNEDMESSAGE_INFORMATION_FAULT_ECDSA_SIGNATURE = 8;
+	SIGNEDMESSAGE_INFORMATION_FAULT_LOCAL_ENTITY_START = 9;
+	SIGNEDMESSAGE_INFORMATION_FAULT_LOCAL_ENTITY_RESULT = 10;
+	SIGNEDMESSAGE_INFORMATION_FAULT_COULD_NOT_RETRIEVE_KEY = 11;
+	SIGNEDMESSAGE_INFORMATION_FAULT_COULD_NOT_RETRIEVE_TOKEN = 12;
+	SIGNEDMESSAGE_INFORMATION_FAULT_SIGNATURE_TOO_SHORT = 13;
+	SIGNEDMESSAGE_INFORMATION_FAULT_TOKEN_IS_INCORRECT_LENGTH = 14;
+	SIGNEDMESSAGE_INFORMATION_FAULT_INCORRECT_EPOCH = 15;
+	SIGNEDMESSAGE_INFORMATION_FAULT_IV_INCORRECT_LENGTH = 16;
+	SIGNEDMESSAGE_INFORMATION_FAULT_TIME_EXPIRED = 17;
+	SIGNEDMESSAGE_INFORMATION_FAULT_NOT_PROVISIONED_WITH_IDENTITY = 18;
+	SIGNEDMESSAGE_INFORMATION_FAULT_COULD_NOT_HASH_METADATA = 19;
+}
+
+message SignedMessage_status {
+	uint32 counter = 1;
+	SignedMessage_information_E signedMessageInformation = 2;
+}
+
+enum SleepManagerCommand_E {
+	SLEEPMANAGER_COMMAND_NONE = 0;
+	SLEEPMANAGER_GET_STATS = 1;
+	SLEEPMANAGER_RESET_STATS = 2;
+}
+
+message SleepManagerRequest {
+	oneof sub_message {
+		DelaySleepRequest delaySleepRequest = 1;
+		SleepManagerCommand_E sleepManagerCommand = 2;
+	}
+}
+
+message SleepManagerStats {
+	BLEAdditionalTRIMApplied_E isBLETrimApplied = 3;
+	uint32 totalAwakeTime = 2;
+	uint32 totalCPUTime = 1;
+}
+
+message StageBlock {
+	uint32 blockAddress = 1;
+	bytes blockToStage = 2;
+}
+
+message ToKeyfobMessage {
+	oneof sub_message {
+		BLEConfigCommand BLEConfigCommand = 43;
+		AuthenticationRequest authenticationRequest = 3;
+		GenealogyRequest_E genealogyRequest = 31;
+		IMURequest_E imuRequest = 33;
+		NFCSERequest_E nfcseRequest = 34;
+		RCI_control_E rciControl = 42;
+		SleepManagerRequest sleepManagerRequest = 32;
+		ToRCI toRCICommand = 41;
+		UpdaterCommand updaterCommand = 30;
+	}
+}
+
+message ToRCI {
+	bytes command = 1;
+	oneof sub_message {
+		bytes HMAC_signature = 2;
+		RCISignature rci_signature = 3;
+	}
+}
+
+message ToTPWheelUnitMessage {
+	oneof sub_message {
+		TPDataRequest_E TPDataRequest = 35;
+		TPNotifyTrackerCommand_E TPNotifyTrackerCommand = 37;
+		GenealogyRequest_E genealogyRequest = 31;
+		ResetTrackerCommand_E resetTrackerCommand = 36;
+		SetTPConfigration setTPConfiguration = 38;
+		SleepManagerRequest sleepManagerRequest = 32;
+		UpdaterCommand updaterCommand = 30;
+	}
+}
+
+message ToVCSECMessage {
+	oneof sub_message {
+		SignedMessage signedMessage = 1;
+		UnsignedMessage unsignedMessage = 2;
+	}
+}
+
+message TPAdv {
+	TPNotifyReason_E TPNotifyReason = 3;
+	uint32 advertismentCount = 5;
+	uint32 batteryVoltage_mV = 4;
+	int32 pressure = 1;
+	sint32 temperature = 2;
+}
+
+message TPData {
+	int32 pressure = 1;
+	sint32 temperature = 2;
+}
+
+enum TPDataRequest_E {
+	TP_DATAREQUEST_NONE = 0;
+	TP_DATAREQUEST_PRESSURE_TEMPERATURE = 1;
+	TP_DATAREQUEST_NEW_SENSOR_INFO = 2;
+	TP_DATAREQUEST_WHEEL_ROTATION_DIRECTION = 3;
+}
+
+message TPLRDetection {
+	LRDetectionResult_E LRDetectionResult = 1;
+	uint32 totalPeriod_ms = 2;
+	uint32 x270degCnt = 4;
+	uint32 x90degCnt = 3;
+	uint32 zAccelDiffCnt = 6;
+	sint32 zAcceleration_dg = 5;
+}
+
+message TPMotionConfig {
+	MLXWakePeriod_E PTMeasurePeriod = 3;
+	uint32 pressureDelta = 1;
+	uint32 temperatureDelta = 2;
+}
+
+message TPNewSensorData {
+	PublicKey sensorPublicKey = 1;
+}
+
+enum TPNotifyReason_E {
+	TP_NOTIFY_REASON_UNKNOWN = 0;
+	TP_NOTIFY_REASON_LOW_PRESSURE = 1;
+	TP_NOTIFY_REASON_PT_VALUE_UPDATE = 2;
+	TP_NOTIFY_REASON_WHEEL_MOVING = 3;
+	TP_NOTIFY_REASON_WHEEL_ROTATION_DIRECTION_CALCULATION_READY = 4;
+	TP_NOTIFY_REASON_LF = 5;
+	TP_NOTIFY_REASON_FAULT = 6;
+}
+
+enum TPNotifyTrackerCommand_E {
+	TP_NOTIFYTRACKER_COMMAND_NONE = 0;
+	TP_NOTIFYTRACKER_COMMAND_GET_STATS = 1;
+	TP_NOTIFYTRACKER_COMMAND_CLEAR_STATS = 2;
+}
+
+message TPNotifyTrackerStats {
+	uint32 notifyReasonFaultCount = 7;
+	uint32 notifyReasonLFCount = 6;
+	uint32 notifyReasonLowPressureCount = 2;
+	uint32 notifyReasonPTValueUpdateCount = 3;
+	uint32 notifyReasonUnknownCount = 1;
+	uint32 notifyReasonWheelMovingCount = 4;
+	uint32 notifyReasonWheelRotationDirectionReadyCount = 5;
+}
+
+message TPStationaryConfig {
+	uint32 PTMeasureMod = 5;
+	int32 absoluteAccelWakeThreshold = 4;
+	MLXWakePeriod_E accelMeasurePeriod = 3;
+	uint32 lowPressureThreshold = 1;
+	uint32 pressureDelta = 2;
+}
+
+message TPWheelUnitInfo {
+	bytes MLXAppCRC = 2;
+	bytes TIAppCRC = 1;
+	uint32 batteryVoltage_mV = 3;
+}
+
+message UnknownKeyInfo {
+	KeyFormFactor keyFormFactor = 3;
+	KeyStatus keyStatus = 1;
+	PublicKey publicKey = 2;
+}
+
+message UnsecureNotification {
+	ClosureStatuses closureStatuses = 2;
+	bool notifyUser = 1;
+}
+
+message UnsignedMessage {
+	PersonalizationInformation personalizationInformation = 25;
+	oneof sub_message {
+		IMUState_E IMUState = 24;
+		RKEAction_E RKEAction = 2;
+		BLEConfigAll BLEConfigAll = 38;
+		InformationRequest InformationRequest = 1;
+		TPAdv TPAdv = 5;
+		TPData TPData = 28;
+		TPLRDetection TPLRDetection = 33;
+		TPNewSensorData TPNewSensorData = 32;
+		TPNotifyTrackerStats TPNotifyTrackerStats = 31;
+		TPWheelUnitInfo TPWheelUnitInfo = 29;
+		WhitelistOperation WhitelistOperation = 16;
+		AppDeviceInfo appDeviceInfo = 40;
+		AuthenticationResponse authenticationResponse = 3;
+		ClosureMoveRequest closureMoveRequest = 4;
+		ConnectionMetrics connectionMetrics = 34;
+		Activity_E deviceActivity = 35;
+		DeviceMotion deviceMotion = 39;
+		FromRCI fromRCIResponse = 37;
+		GenealogyResponse genealogyResponse = 21;
+		GetSessionInfoRequest getEpochSessionInfo = 36;
+		KeyfobInfo keyfobInfo = 23;
+		SleepManagerStats lowPowerDeviceSleepManagerStats = 27;
+		NFCSEState nfcseState = 26;
+		ResetTrackerStats resetTrackerStats = 30;
+		KeyMetadata setMetaDataForKey = 22;
+		UpdaterResponse updaterResponse = 20;
+	}
+}
+
+message UnsignedMessageShort {
+	oneof sub_message {
+		IMUState_E IMUState = 24;
+		RKEAction_E RKEAction = 2;
+		BLEConfigAll BLEConfigAll = 38;
+		AuthenticationResponse authenticationResponse = 3;
+		FromRCI fromRCIResponse = 37;
+		GenealogyResponse genealogyResponse = 21;
+		KeyfobInfo keyfobInfo = 23;
+		SleepManagerStats lowPowerDeviceSleepManagerStats = 27;
+		NFCSEState nfcseState = 26;
+		UpdaterResponse updaterResponse = 20;
+	}
+}
+
+message UnsignedMessageTPWheelUnit {
+	oneof sub_message {
+		TPAdv TPAdv = 5;
+		TPData TPData = 28;
+		TPLRDetection TPLRDetection = 33;
+		TPNewSensorData TPNewSensorData = 32;
+		TPNotifyTrackerStats TPNotifyTrackerStats = 31;
+		TPWheelUnitInfo TPWheelUnitInfo = 29;
+		ConnectionMetrics connectionMetrics = 34;
+		GenealogyResponse genealogyResponse = 21;
+		SleepManagerStats lowPowerDeviceSleepManagerStats = 27;
+		ResetTrackerStats resetTrackerStats = 30;
+		UpdaterResponse updaterResponse = 20;
+	}
+}
+
+message UpdaterCommand {
+	oneof sub_message {
+		bytes firmwareInfo = 5;
+		GetCodeDescriptor getCodeDescriptor = 1;
+		SetUpdaterLocation setUpdaterLocation = 2;
+		StageBlock stageBlock = 3;
+		VerifyAndInstallApp verifyAndInstallApp = 4;
+	}
+}
+
+enum UpdaterLocation {
+	UPDATER_LOCATION_NONE = 0;
+	UPDATER_LOCATION_APPLICATION = 1;
+	UPDATER_LOCATION_BOOTLOADER = 2;
+	UPDATER_LOCATION_SECONDARY_APPLICATION = 3;
+	UPDATER_LOCATION_APPLICATION_IN_EXTERNAL_FLASH = 4;
+}
+
+message UpdaterResponse {
+	oneof sub_message {
+		CodeDescriptor codeDescriptorMessage = 1;
+		UpdaterStatus updaterStatus = 2;
+	}
+}
+
+message UpdaterStatus {
+	UpdaterLocation location = 2;
+	uint32 nextAddressNumber = 3;
+	UpdaterStatusCode statusCode = 1;
+}
+
+enum UpdaterStatusCode {
+	UPDATER_STATUS_CODE_ERROR = 0;
+	UPDATER_STATUS_CODE_WAIT = 1;
+	UPDATER_STATUS_CODE_BLOCK_STAGED = 2;
+	UPDATER_STATUS_CODE_IMAGE_STAGED = 3;
+	UPDATER_STATUS_CODE_CRC_CHECK_SUCCESS = 4;
+	UPDATER_STATUS_CODE_CRC_CHECK_FAIL = 5;
+	UPDATER_STATUS_CODE_HASH_FAIL = 6;
+	UPDATER_STATUS_CODE_SIGNATURE_FAIL = 7;
+	UPDATER_STATUS_CODE_ERROR_HASH_RESTORE_FAIL = 8;
+	UPDATER_STATUS_CODE_LOCATION_SET = 9;
+}
+
+message VehicleInfo {
+	string VIN = 1;
+}
+
+enum VehicleLockState_E {
+	VEHICLELOCKSTATE_UNLOCKED = 0;
+	VEHICLELOCKSTATE_LOCKED = 1;
+	VEHICLELOCKSTATE_INTERNAL_LOCKED = 2;
+	VEHICLELOCKSTATE_SELECTIVE_UNLOCKED = 3;
+}
+
+enum VehicleSleepStatus_E {
+	VEHICLE_SLEEP_STATUS_UNKNOWN = 0;
+	VEHICLE_SLEEP_STATUS_AWAKE = 1;
+	VEHICLE_SLEEP_STATUS_ASLEEP = 2;
+}
+
+message VehicleStatus {
+	ClosureStatuses closureStatuses = 1;
+	VehicleLockState_E vehicleLockState = 2;
+	VehicleSleepStatus_E vehicleSleepStatus = 3;
+}
+
+message VerifyAndInstallApp {
+	bytes rValue = 2;
+	bytes sValue = 3;
+	bytes sha256 = 1;
+}
+
+message WhitelistEntryInfo {
+	KeyIdentifier keyId = 1;
+	Role keyRole = 7;
+	KeyMetadata metadataForKey = 4;
+	repeated WhitelistKeyPermission_E permissions = 3;
+	PublicKey publicKey = 2;
+	uint32 secondsEntryRemainsActive = 5;
+	uint32 slot = 6;
+}
+
+message WhitelistInfo {
+	uint32 numberOfEntries = 1;
+	uint32 slotMask = 3;
+	repeated KeyIdentifier whitelistEntries = 2;
+}
+
+enum WhitelistKeyPermission_E {
+	WHITELISTKEYPERMISSION_ADD_TO_WHITELIST = 0;
+	WHITELISTKEYPERMISSION_LOCAL_UNLOCK = 1;
+	WHITELISTKEYPERMISSION_LOCAL_DRIVE = 2;
+	WHITELISTKEYPERMISSION_REMOTE_UNLOCK = 3;
+	WHITELISTKEYPERMISSION_REMOTE_DRIVE = 4;
+	WHITELISTKEYPERMISSION_CHANGE_PERMISSIONS = 5;
+	WHITELISTKEYPERMISSION_REMOVE_FROM_WHITELIST = 6;
+	WHITELISTKEYPERMISSION_REMOVE_SELF_FROM_WHITELIST = 7;
+	WHITELISTKEYPERMISSION_MODIFY_FLEET_RESERVED_SLOTS = 8;
+	WHITELISTKEYPERMISSION_UNKNOWN = 31;
+}
+
+message WhitelistOperation {
+	KeyMetadata metadataForKey = 6;
+	oneof sub_message {
+		PermissionChange addImpermanentKey = 8;
+		PermissionChange addImpermanentKeyAndRemoveExisting = 9;
+		PermissionChange addKeyToWhitelistAndAddPermissions = 5;
+		PermissionChange addPermissionsToPublicKey = 3;
+		PublicKey addPublicKeyToWhitelist = 1;
+		bool removeAllImpermanentKeys = 16;
+		PermissionChange removePermissionsFromPublicKey = 4;
+		PublicKey removePublicKeyFromWhitelist = 2;
+		PermissionChange updateKeyAndPermissions = 7;
+	}
+}
+
+enum WhitelistOperation_information_E {
+	WHITELISTOPERATION_INFORMATION_NONE = 0;
+	WHITELISTOPERATION_INFORMATION_UNDOCUMENTED_ERROR = 1;
+	WHITELISTOPERATION_INFORMATION_NO_PERMISSION_TO_REMOVE_ONESELF = 2;
+	WHITELISTOPERATION_INFORMATION_KEYFOB_SLOTS_FULL = 3;
+	WHITELISTOPERATION_INFORMATION_WHITELIST_FULL = 4;
+	WHITELISTOPERATION_INFORMATION_NO_PERMISSION_TO_ADD = 5;
+	WHITELISTOPERATION_INFORMATION_INVALID_PUBLIC_KEY = 6;
+	WHITELISTOPERATION_INFORMATION_NO_PERMISSION_TO_REMOVE = 7;
+	WHITELISTOPERATION_INFORMATION_NO_PERMISSION_TO_CHANGE_PERMISSIONS = 8;
+	WHITELISTOPERATION_INFORMATION_ATTEMPTING_TO_ELEVATE_OTHER_ABOVE_ONESELF = 9;
+	WHITELISTOPERATION_INFORMATION_ATTEMPTING_TO_DEMOTE_SUPERIOR_TO_ONESELF = 10;
+	WHITELISTOPERATION_INFORMATION_ATTEMPTING_TO_REMOVE_OWN_PERMISSIONS = 11;
+	WHITELISTOPERATION_INFORMATION_PUBLIC_KEY_NOT_ON_WHITELIST = 12;
+	WHITELISTOPERATION_INFORMATION_ATTEMPTING_TO_ADD_KEY_THAT_IS_ALREADY_ON_THE_WHITELIST = 13;
+	WHITELISTOPERATION_INFORMATION_NOT_ALLOWED_TO_ADD_UNLESS_ON_READER = 14;
+	WHITELISTOPERATION_INFORMATION_FM_MODIFYING_OUTSIDE_OF_F_MODE = 15;
+	WHITELISTOPERATION_INFORMATION_FM_ATTEMPTING_TO_ADD_PERMANENT_KEY = 16;
+	WHITELISTOPERATION_INFORMATION_FM_ATTEMPTING_TO_REMOVE_PERMANENT_KEY = 17;
+	WHITELISTOPERATION_INFORMATION_KEYCHAIN_WHILE_FS_FULL = 18;
+	WHITELISTOPERATION_INFORMATION_ATTEMPTING_TO_ADD_KEY_WITHOUT_ROLE = 19;
+}
+
+message WhitelistOperation_status {
+	OperationStatus_E operationStatus = 3;
+	KeyIdentifier signerOfOperation = 2;
+	WhitelistOperation_information_E whitelistOperationInformation = 1;
+}
+
