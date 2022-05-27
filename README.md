@@ -1,6 +1,6 @@
 <a href="https://trifinite.org/stuff/vcsec-archive/" target="_blank"><img align="right" src="/images/vcsec_archive_logo.png"/></a>
 
-# VCSEC-Archive - archive of Tesla VCSEC protocol buffer definitions
+# VCSEC-Archive - a collection of Tesla VCSEC protocol buffer definitions
 
 Find out more about the tempara application on https://trifinite.org/stuff/vcsec-archive/ 
 
