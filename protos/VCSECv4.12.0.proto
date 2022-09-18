@@ -252,6 +252,16 @@ enum GenealogyStatus_E {
 	GENEALOGY_STATUS_CRC_FAILURE = 6;
 }
 
+enum GenericError_E {
+	GENERICERROR_NONE = 0;
+	GENERICERROR_UNKNOWN = 1;
+	GENERICERROR_CLOSURES_OPEN = 2;
+	GENERICERROR_ALREADY_ON = 3;
+	GENERICERROR_DISABLED_FOR_USER_COMMAND = 4;
+	GENERICERROR_VEHICLE_NOT_IN_PARK = 5;
+	GENERICERROR_UNAUTHORIZED = 6;
+}
+
 message GetCodeDescriptor {
 	UpdaterLocation location = 1;
 }
@@ -356,6 +366,13 @@ enum KeyFormFactor {
 
 message KeyIdentifier {
 	bytes publicKeySHA1 = 1;
+}
+
+message KeyIdentity {
+	oneof sub_message {
+		bytes public_key = 1;
+		bytes key_id = 2;
+	}
 }
 
 message KeyMetadata {
@@ -574,14 +591,6 @@ message SessionInfo {
 	bytes token = 1;
 	uint32 counter = 2;
 	bytes publicKey = 3;
-}
-
-message SessionInfo {
-	uint32 counter = 1;
-	bytes publicKey = 2;
-	bytes epoch = 3;
-	fixed32 clock_time = 4;
-	Session_Info_Status status = 5;
 }
 
 message SetTPConfigration {
