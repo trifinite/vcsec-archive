@@ -28,9 +28,7 @@ message AlertHandlePulledWithoutAuth {
 	uint32 connectionCount = 3;
 	bool unknownDevicePresent = 4;
 	bool authRequested = 5;
-	oneof sub_message {
-		HandlePulledWithoutAuthDeviceSpecificPayload deviceSpecificPayload = 6;
-	}
+	repeated HandlePulledWithoutAuthDeviceSpecificPayload deviceSpecificPayload = 6;
 }
 
 message AppDeviceInfo {
@@ -165,10 +163,8 @@ message DelaySleepRequest {
 }
 
 message DeviceMotion {
+	repeated Device_Motion_State states = 1;
 	Device_Motion_Confidence confidence = 2;
-	oneof sub_message {
-		Device_Motion_State states = 1;
-	}
 }
 
 enum Device_Motion_Confidence {
@@ -374,9 +370,7 @@ message KeyStatus {
 }
 
 message KeyStatusInfo {
-	oneof sub_message {
-		KeyStatus keyStatuses = 1;
-	}
+	repeated KeyStatus keyStatuses = 1;
 }
 
 message KeyfobInfo {
@@ -483,11 +477,9 @@ enum OperationStatus_E {
 
 message PermissionChange {
 	PublicKey key = 1;
+	repeated WhitelistKeyPermission_E permission = 2;
 	uint32 secondsToBeActive = 3;
 	Role keyRole = 4;
-	oneof sub_message {
-		WhitelistKeyPermission_E permission = 2;
-	}
 }
 
 message PersonalizationInformation {
@@ -866,21 +858,17 @@ message VerifyAndInstallApp {
 message WhitelistEntryInfo {
 	KeyIdentifier keyId = 1;
 	PublicKey publicKey = 2;
+	repeated WhitelistKeyPermission_E permissions = 3;
 	KeyMetadata metadataForKey = 4;
 	uint32 secondsEntryRemainsActive = 5;
 	uint32 slot = 6;
 	Role keyRole = 7;
-	oneof sub_message {
-		WhitelistKeyPermission_E permissions = 3;
-	}
 }
 
 message WhitelistInfo {
 	uint32 numberOfEntries = 1;
+	repeated KeyIdentifier whitelistEntries = 2;
 	uint32 slotMask = 3;
-	oneof sub_message {
-		KeyIdentifier whitelistEntries = 2;
-	}
 }
 
 enum WhitelistKeyPermission_E {
