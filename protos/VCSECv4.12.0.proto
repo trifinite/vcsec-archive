@@ -211,7 +211,7 @@ message FromVCSECMessage {
 		TPNotifyTrackerCommand_E TPNotifyTrackerCommand = 37;
 		SetTPConfigration setTPConfiguration = 38;
 		UnsecureNotification unsecureNotification = 39;
-		SessionInfo epochSessionInfo = 40;
+		Signatures.SessionInfo epochSessionInfo = 40;
 		ToRCI toRCICommand = 41;
 		RCI_control_E rciControl = 42;
 		BLEConfigCommand BLEConfigCommand = 43;
@@ -266,6 +266,18 @@ message GetSessionInfoRequest {
 	KeyIdentity key_identity = 1;
 }
 
+enum HandlePulled_E {
+	HANDLE_PULLED_FRONT_DRIVER_DOOR = 0;
+	HANDLE_PULLED_FRONT_PASSENGER_DOOR = 1;
+	HANDLE_PULLED_REAR_DRIVER_DOOR = 2;
+	HANDLE_PULLED_REAR_PASSENGER_DOOR = 3;
+	HANDLE_PULLED_TRUNK = 4;
+	HANDLE_PULLED_CHARGE_PORT = 5;
+	HANDLE_PULLED_FRONT_DRIVER_AUTO_PRESENT_DOOR = 6;
+	HANDLE_PULLED_FRONT_PASSENGER_AUTO_PRESENT_DOOR = 7;
+	HANDLE_PULLED_OTHER = 8;
+}
+
 message HandlePulledWithoutAuthDeviceSpecificPayload {
 	uint32 keyChannel = 1;
 	AuthenticationLevel_E authenticationLevel = 2;
@@ -292,18 +304,6 @@ message HandlePulledWithoutAuthDeviceSpecificPayload {
 	bool sortedDeltaBayesRightPresent = 23;
 	bool rawDeltaBayesLeftPresent = 24;
 	bool rawDeltaBayesRightPresent = 25;
-}
-
-enum HandlePulled_E {
-	HANDLE_PULLED_FRONT_DRIVER_DOOR = 0;
-	HANDLE_PULLED_FRONT_PASSENGER_DOOR = 1;
-	HANDLE_PULLED_REAR_DRIVER_DOOR = 2;
-	HANDLE_PULLED_REAR_PASSENGER_DOOR = 3;
-	HANDLE_PULLED_TRUNK = 4;
-	HANDLE_PULLED_CHARGE_PORT = 5;
-	HANDLE_PULLED_FRONT_DRIVER_AUTO_PRESENT_DOOR = 6;
-	HANDLE_PULLED_FRONT_PASSENGER_AUTO_PRESENT_DOOR = 7;
-	HANDLE_PULLED_OTHER = 8;
 }
 
 enum IMURequest_E {
@@ -340,6 +340,12 @@ enum InformationRequestType {
 	INFORMATION_REQUEST_TYPE_GET_KEYSTATUS_INFO = 8;
 	INFORMATION_REQUEST_TYPE_GET_ACTIVE_KEY = 9;
 	INFORMATION_REQUEST_TYPE_GET_CAPABILITIES = 16;
+}
+
+message KeyfobInfo {
+	bytes appCRC = 1;
+	uint32 batteryVoltage_mV = 2;
+	int32 temperature_degreesC = 3;
 }
 
 enum KeyFormFactor {
@@ -383,12 +389,6 @@ message KeyStatus {
 
 message KeyStatusInfo {
 	repeated KeyStatus keyStatuses = 1;
-}
-
-message KeyfobInfo {
-	bytes appCRC = 1;
-	uint32 batteryVoltage_mV = 2;
-	int32 temperature_degreesC = 3;
 }
 
 enum LRDetectionResult_E {
@@ -506,14 +506,33 @@ message PublicKey {
 	bytes PublicKeyRaw = 1;
 }
 
+enum RCI_control_E {
+	RCI_CONTROL_NONE = 0;
+	RCI_CONTROL_TURN_OFF = 1;
+}
+
 message RCISignature {
 	bytes nonce = 1;
 	bytes tag = 2;
 }
 
-enum RCI_control_E {
-	RCI_CONTROL_NONE = 0;
-	RCI_CONTROL_TURN_OFF = 1;
+enum ResetTrackerCommand_E {
+	RESETTRACKER_COMMAND_NONE = 0;
+	RESETTRACKER_COMMAND_GET_STATS = 1;
+	RESETTRACKER_COMMAND_CLEAR_STATS = 2;
+}
+
+message ResetTrackerStats {
+	uint32 totalResetsDueToPowerOn = 1;
+	uint32 totalResetsDueToPinReset = 2;
+	uint32 totalResetsDueToVDDSLoss = 3;
+	uint32 totalResetsDueToVDDLoss = 4;
+	uint32 totalResetsDueToVDDRLoss = 5;
+	uint32 totalResetsDueToClockLoss = 6;
+	uint32 totalResetsDueToSystemReset = 7;
+	uint32 totalResetsDueToWarmReset = 8;
+	uint32 totalResetsDueToWakeupFromShutdown = 9;
+	uint32 totalResetsDueToWakeupFromTCKNoise = 10;
 }
 
 enum RKEAction_E {
@@ -550,25 +569,6 @@ enum RKEAction_E {
 	RKE_ACTION_WAKE_VEHICLE = 30;
 }
 
-enum ResetTrackerCommand_E {
-	RESETTRACKER_COMMAND_NONE = 0;
-	RESETTRACKER_COMMAND_GET_STATS = 1;
-	RESETTRACKER_COMMAND_CLEAR_STATS = 2;
-}
-
-message ResetTrackerStats {
-	uint32 totalResetsDueToPowerOn = 1;
-	uint32 totalResetsDueToPinReset = 2;
-	uint32 totalResetsDueToVDDSLoss = 3;
-	uint32 totalResetsDueToVDDLoss = 4;
-	uint32 totalResetsDueToVDDRLoss = 5;
-	uint32 totalResetsDueToClockLoss = 6;
-	uint32 totalResetsDueToSystemReset = 7;
-	uint32 totalResetsDueToWarmReset = 8;
-	uint32 totalResetsDueToWakeupFromShutdown = 9;
-	uint32 totalResetsDueToWakeupFromTCKNoise = 10;
-}
-
 enum Role {
 	ROLE_NONE = 0;
 	ROLE_SERVICE = 1;
@@ -585,6 +585,11 @@ message SessionInfo {
 	bytes publicKey = 3;
 }
 
+enum Session_Info_Status {
+	SESSION_INFO_STATUS_OK = 0;
+	SESSION_INFO_STATUS_KEY_NOT_ON_WHITELIST = 1;
+}
+
 message SetTPConfigration {
 	TPStationaryConfig stationaryConfig = 1;
 	TPMotionConfig motionConfig = 2;
@@ -592,6 +597,16 @@ message SetTPConfigration {
 
 message SetUpdaterLocation {
 	UpdaterLocation updaterLocation = 1;
+}
+
+message Signatures {
+	message SessionInfo {
+		uint32 counter = 1;
+		bytes publicKey = 2;
+		bytes epoch = 3;
+		fixed32 clock_time = 4;
+		Session_Info_Status status = 5;
+	}
 }
 
 enum SignatureType {
@@ -661,6 +676,21 @@ message SleepManagerStats {
 message StageBlock {
 	uint32 blockAddress = 1;
 	bytes blockToStage = 2;
+}
+
+message ToRCI {
+	bytes command = 1;
+	oneof sub_message {
+		bytes HMAC_signature = 2;
+		RCISignature rci_signature = 3;
+	}
+}
+
+message ToVCSECMessage {
+	oneof sub_message {
+		SignedMessage signedMessage = 1;
+		UnsignedMessage unsignedMessage = 2;
+	}
 }
 
 message TPAdv {
@@ -740,21 +770,6 @@ message TPWheelUnitInfo {
 	bytes TIAppCRC = 1;
 	bytes MLXAppCRC = 2;
 	uint32 batteryVoltage_mV = 3;
-}
-
-message ToRCI {
-	bytes command = 1;
-	oneof sub_message {
-		bytes HMAC_signature = 2;
-		RCISignature rci_signature = 3;
-	}
-}
-
-message ToVCSECMessage {
-	oneof sub_message {
-		SignedMessage signedMessage = 1;
-		UnsignedMessage unsignedMessage = 2;
-	}
 }
 
 message UnknownKeyInfo {
