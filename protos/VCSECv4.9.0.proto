@@ -217,7 +217,6 @@ message FromVCSECMessage {
 		BLEConfigCommand BLEConfigCommand = 43;
 		AppDeviceInfoRequest_E appDeviceInfoRequest = 44;
 		Alert alert = 45;
-		NominalError nominalError = 46;
 	}
 }
 
@@ -246,16 +245,6 @@ enum GenealogyStatus_E {
 	GENEALOGY_STATUS_READ_SUCCESS = 4;
 	GENEALOGY_STATUS_READ_FAILURE = 5;
 	GENEALOGY_STATUS_CRC_FAILURE = 6;
-}
-
-enum GenericError_E {
-	GENERICERROR_NONE = 0;
-	GENERICERROR_UNKNOWN = 1;
-	GENERICERROR_CLOSURES_OPEN = 2;
-	GENERICERROR_ALREADY_ON = 3;
-	GENERICERROR_DISABLED_FOR_USER_COMMAND = 4;
-	GENERICERROR_VEHICLE_NOT_IN_PARK = 5;
-	GENERICERROR_UNAUTHORIZED = 6;
 }
 
 message GetCodeDescriptor {
@@ -363,7 +352,6 @@ enum KeyFormFactor {
 	KEY_FORM_FACTOR_5_BUTTON_GEN2_CAR_KEYFOB_P60 = 11;
 	KEY_FORM_FACTOR_3_BUTTON_GEN2_CAR_KEYFOB_P60_V2 = 12;
 	KEY_FORM_FACTOR_3_BUTTON_GEN2_CAR_KEYFOB_P60_V3 = 13;
-	KEY_FORM_FACTOR_NFC_CARD_P71 = 14;
 }
 
 message KeyIdentifier {
@@ -481,10 +469,6 @@ enum NFCSEVehiclePubKeyState_E {
 	NFCSEC_VEHICLEPUBKEY_STATE_NOT_RETRIEVED = 2;
 }
 
-message NominalError {
-	GenericError_E genericError = 1;
-}
-
 enum OperationStatus_E {
 	OPERATIONSTATUS_OK = 0;
 	OPERATIONSTATUS_WAIT = 1;
@@ -575,8 +559,6 @@ enum Role {
 	ROLE_OWNER = 2;
 	ROLE_DRIVER = 3;
 	ROLE_FM = 4;
-	ROLE_VEHICLE_MONITOR = 5;
-	ROLE_CHARGING_MANAGER = 6;
 }
 
 message SessionInfo {
